@@ -11,20 +11,22 @@ def get_range_for_difficulty(difficulty: str):
     return 1, 100
 
 
-def parse_guess(raw: str):
-    if raw is None:
+def parse_guess(raw: str, low: int = 1, high: int = 100):
+    if raw is None or raw.strip() == "":
         return False, None, "Enter a guess."
 
-    if raw == "":
-        return False, None, "Enter a guess."
+    text = raw.strip()
 
     try:
-        if "." in raw:
-            value = int(float(raw))
+        if "." in text:
+            value = int(float(text))
         else:
-            value = int(raw)
-    except Exception:
+            value = int(text)
+    except ValueError:
         return False, None, "That is not a number."
+
+    if value < low or value > high:
+        return False, None, f"Enter a number between {low} and {high}."
 
     return True, value, None
 
@@ -93,7 +95,7 @@ if "secret" not in st.session_state:
     st.session_state.secret = random.randint(low, high)
 
 if "attempts" not in st.session_state:
-    st.session_state.attempts = 1
+    st.session_state.attempts = 0
 
 if "score" not in st.session_state:
     st.session_state.score = 0
@@ -106,10 +108,13 @@ if "history" not in st.session_state:
 
 st.subheader("Make a guess")
 
-st.info(
-    f"Guess a number between 1 and 100. "
-    f"Attempts left: {attempt_limit - st.session_state.attempts}"
-)
+attempts_box = st.empty()
+
+def render_attempts():
+    attempts_box.info(
+        f"Guess a number between {low} and {high}. "
+        f"Attempts left: {attempt_limit - st.session_state.attempts}"
+    )
 
 with st.expander("Developer Debug Info"):
     st.write("Secret:", st.session_state.secret)
@@ -142,17 +147,17 @@ if st.session_state.status != "playing":
         st.success("You already won. Start a new game to play again.")
     else:
         st.error("Game over. Start a new game to try again.")
+    render_attempts()
     st.stop()
 
 if submit:
-    st.session_state.attempts += 1
-
-    ok, guess_int, err = parse_guess(raw_guess)
+    ok, guess_int, err = parse_guess(raw_guess, low, high)
 
     if not ok:
         st.session_state.history.append(raw_guess)
         st.error(err)
     else:
+        st.session_state.attempts += 1
         st.session_state.history.append(guess_int)
 
         if st.session_state.attempts % 2 == 0:
@@ -186,6 +191,8 @@ if submit:
                     f"The secret was {st.session_state.secret}. "
                     f"Score: {st.session_state.score}"
                 )
+
+render_attempts()
 
 st.divider()
 st.caption("Built by an AI that claims this code is production-ready.")
