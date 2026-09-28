@@ -52,11 +52,9 @@ Assume secret number is 60
 ```
 # Paste your pytest output here, e.g.:
 # pytest tests/
-
-![alt text](image-3.png)
 # ========================= 144 passed in 0.83s =========================
 ```
-
+![alt text](image-3.png)
 ## 🚀 Stretch Features
 
 - [ ] [If you choose to complete Challenge 4, describe the Enhanced UI changes here — a screenshot is optional]
