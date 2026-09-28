@@ -41,22 +41,21 @@ Alphabets throw a "that's not a number" error (This Is Good)
 -> Claude
 
 - Give one example of an AI suggestion that was correct (including what the AI suggested and how you verified the result).
--> The suggestion to input 1 and 100 and low and high respectively to the parse_guess function to solve the issue
-of the game not recognizing numbers outside 1-100 as errors.
+-> The suggestion to input 1 and 100 and low and high respectively to the parse_guess function to solve the issue of the game not recognizing numbers outside 1-100 as errors.
 
 - Give one example of an AI suggestion that was incorrect or misleading (including what the AI suggested and how you verified the result).
--> In my case, AI just didn't suggest a fix which I implemented. For example, the st.session_state attempts was set to 1 which made the intial game start with 7 attempts instead of 8.
+-> In my case, AI fixed the issue of numbers/blank submissions being seen as valid to affect no. of attempts. However, it did not initially include an error/warning for the user which I had to additionally ask to implement. It would have been misleading to blindly reject user input without stating the main issue.
 
 ---
 
 ## 3. Debugging and testing your fixes
 
 - How did you decide whether a bug was really fixed?
--> I ran the code again and re-checked every error.
+-> I asked Claude to generate pytest cases in tests file and ran pytests in the terminal to make sure that the new tests were passing with the existing starter tests. 
 
 - Describe at least one test you ran (manual or using pytest)  
   and what it showed you about your code.
--> I put 0 and 101 as guessing numbers and got an error that the range was 1 to 100
+-> I put t and "" as guessing numbers and got an error showing "That is not a number" and "Enter a Guess" respectively.
 
 - Did AI help you design or understand any tests? How?
 -> No, I just tested based on previous bugs identified by myself.

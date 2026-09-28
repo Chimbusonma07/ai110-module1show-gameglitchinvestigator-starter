@@ -46,9 +46,18 @@ Describe your fixed game in numbered steps so a reader can follow along without 
 ```
 # Paste your pytest output here, e.g.:
 # pytest tests/
+
+![alt text](image.png)
 # ========================= X passed in 0.XXs =========================
 ```
 
 ## 🚀 Stretch Features
 
 - [ ] [If you choose to complete Challenge 4, describe the Enhanced UI changes here — a screenshot is optional]
+# UI CHANGES
+- Gradient hero header
+- Three-card scoreboard
+- A progress bar
+- A visual guess history
+BEFORE: ![alt text](image-1.png)
+AFTER: ![alt text](image-2.png)
