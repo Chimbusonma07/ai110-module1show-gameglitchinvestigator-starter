@@ -63,5 +63,6 @@ Assume secret number is 60
 - Three-card scoreboard
 - A progress bar
 - A visual guess history
+
 BEFORE: ![alt text](image-1.png)
 AFTER: ![alt text](image-2.png)
