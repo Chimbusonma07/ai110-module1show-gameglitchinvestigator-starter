@@ -53,8 +53,8 @@ Assume secret number is 60
 # Paste your pytest output here, e.g.:
 # pytest tests/
 
-![alt text](image.png)
-# ========================= X passed in 0.XXs =========================
+![alt text](image-3.png)
+# ========================= 144 passed in 0.83s =========================
 ```
 
 ## 🚀 Stretch Features

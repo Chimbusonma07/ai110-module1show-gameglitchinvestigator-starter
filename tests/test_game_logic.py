@@ -390,10 +390,102 @@ def test_repeated_bad_input_never_ends_the_game():
     assert state["history"] == []
 
 
-def test_decimal_check_runs_before_the_number_check():
+def test_text_containing_a_dot_is_reported_as_not_a_number():
     """
-    Documents current precedence: the "." test happens first, so "abc.def"
-    reports the decimal message rather than "That is not a number."
+    "abc.def" used to report the decimal message because the "." test ran
+    before any parsing. Now that dotted input is actually parsed as a float,
+    letters get the message they deserve.
     """
-    assert parse_guess("abc.def", 1, 100)[2] == "Enter a whole number (no decimals)."
+    assert parse_guess("abc.def", 1, 100)[2] == "That is not a number."
     assert parse_guess("3.5", 1, 100)[2] == "Enter a whole number (no decimals)."
+
+
+# ---------------------------------------------------------------------------
+# Edge cases found by probing the parser after the main fixes were in.
+#
+#   - "50.0" was refused even though the player clearly meant 50
+#   - "1_0" was ACCEPTED as 10, because int() honours underscore separators
+#   - a non-str argument crashed with AttributeError instead of being refused
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "raw,expected",
+    [("50.0", 50), ("50.", 50), ("1.0", 1), ("100.00", 100), ("007.0", 7)],
+)
+def test_whole_valued_decimals_are_accepted(raw, expected):
+    """Typing 50.0 means 50, and should not be punished as a bad guess."""
+    ok, guess_int, err = parse_guess(raw, 1, 100)
+
+    assert ok is True
+    assert guess_int == expected
+    assert err is None
+    assert isinstance(guess_int, int), "the value handed to scoring must be an int"
+
+
+@pytest.mark.parametrize("raw", ["3.5", "0.5", ".5", "99.9", "1.0001", "50.5"])
+def test_fractional_decimals_are_still_rejected(raw):
+    """Accepting 50.0 must not open the door to genuine fractions."""
+    ok, guess_int, err = parse_guess(raw, 1, 100)
+
+    assert ok is False
+    assert guess_int is None
+    assert err == "Enter a whole number (no decimals)."
+
+
+@pytest.mark.parametrize("raw", ["500.0", "0.0", "-2.0", "101.0"])
+def test_whole_valued_decimals_still_obey_the_range(raw):
+    """A decimal that parses cleanly is still bounds-checked."""
+    ok, guess_int, err = parse_guess(raw, 1, 100)
+
+    assert ok is False
+    assert guess_int is None
+    assert err == "Enter a number between 1 and 100."
+
+
+@pytest.mark.parametrize("raw", ["1_0", "1_000", "5_0", "_50", "50_", "1_0.0"])
+def test_underscore_separators_are_rejected(raw):
+    """
+    The real defect here: int("1_0") returns 10, so "1_0" used to be accepted
+    as a legitimate guess of 10.
+    """
+    ok, guess_int, err = parse_guess(raw, 1, 100)
+
+    assert ok is False
+    assert guess_int is None
+    assert err == "That is not a number."
+
+
+@pytest.mark.parametrize("raw", ["1e5", "1E5", "1.5e2", "1.0E2", "2e-3"])
+def test_scientific_notation_is_rejected(raw):
+    """Neither the int nor the float path may let exponent syntax through."""
+    ok, guess_int, err = parse_guess(raw, 1, 100)
+
+    assert ok is False
+    assert guess_int is None
+    assert err == "That is not a number."
+
+
+@pytest.mark.parametrize("raw", [50, 3.5, True, False, ["50"], {"n": 50}, object()])
+def test_non_string_input_is_refused_instead_of_crashing(raw):
+    """
+    parse_guess used to raise AttributeError on .strip() for anything that was
+    not a str. st.text_input always returns a str, so this was unreachable from
+    the UI, but the function should not explode when called directly.
+    """
+    ok, guess_int, err = parse_guess(raw, 1, 100)
+
+    assert ok is False
+    assert guess_int is None
+    assert err == "That is not a number."
+
+
+def test_no_input_shape_can_raise():
+    """Nothing a caller passes should escape as an exception."""
+    awkward = ["", "   ", None, 0, -1, 3.5, True, [], {}, "abc", "1_0", "50.0", "٥٠"]
+
+    for raw in awkward:
+        ok, guess_int, err = parse_guess(raw, 1, 100)
+        assert isinstance(ok, bool)
+        assert (guess_int is None) == (not ok)
+        assert (err is None) == ok

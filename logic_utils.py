@@ -20,18 +20,39 @@ def parse_guess(raw: str, low: int = 1, high: int = 100):
     if raw is None:
         return False, None, "Enter a guess."
 
+    # FIX: a non-str raw (an int, a bool, a list) crashed on .strip() with an
+    # AttributeError. Callers now get the same clean rejection as bad text.
+    if not isinstance(raw, str):
+        return False, None, "That is not a number."
+
     text = raw.strip()
 
     if text == "":
         return False, None, "Enter a guess."
 
-    if "." in text:
-        return False, None, "Enter a whole number (no decimals)."
-
-    try:
-        value = int(text)
-    except ValueError:
+    # FIX: int() honours Python's underscore separators, so "1_0" silently
+    # parsed as 10. No player types that, so underscores are refused outright.
+    if "_" in text:
         return False, None, "That is not a number."
+
+    if "." in text:
+        # FIX: every "." was refused, so "50.0" was rejected although the
+        # player plainly meant 50. Whole-valued decimals now parse; genuinely
+        # fractional input like 3.5 still does not.
+        if "e" in text.lower():
+            return False, None, "That is not a number."
+        try:
+            parsed = float(text)
+        except ValueError:
+            return False, None, "That is not a number."
+        if not parsed.is_integer():
+            return False, None, "Enter a whole number (no decimals)."
+        value = int(parsed)
+    else:
+        try:
+            value = int(text)
+        except ValueError:
+            return False, None, "That is not a number."
 
     # FIX: the parse used to succeed for ANY integer, so guesses like 500 or -3
     # were accepted, burned an attempt and were scored. Bounds are now checked
