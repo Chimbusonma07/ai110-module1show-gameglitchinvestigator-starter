@@ -25,19 +25,25 @@ It wrote the code, ran away, and now the game is unplayable.
 
 ## 📝 Document Your Experience
 
-- [ ] Describe the game's purpose.
-- [ ] Detail which bugs you found.
-- [ ] Explain what fixes you applied.
+- [ ] This is a number guessing game. The user is to guess a random secret number between 1 and 100 and the game incorporates the "hot" and "cold" hint system with "higher" and "lower" to guide them to the correct secret number.
+- [ ] I found a total of 4 bugs: Numbers outside the range were accepted, Invalid guesses like letters and blank space affected the attempted guesses number, Number of attempts reduce by 1 by the 2nd guess instead of the 1st
+- [ ] The fixes I applied were: Guesses with numbers outside the range triggered an error message while attempts remained static instead of decreasing by 1, Invalid guesses like letters and blank space did not affect the no. of attempted guesses and threw an error to warn the player.
 
 ## 📸 Demo Walkthrough
 
 Describe your fixed game in numbered steps so a reader can follow along without watching a video:
-
-1. <!-- Describe this step -->
-2. <!-- Describe this step -->
-3. <!-- Describe this step -->
-4. <!-- Describe this step -->
-5. <!-- Add more steps as needed -->
+Assume secret number is 60
+1. User submits 40
+2. Game says "higher"
+3. Attempts are now 7
+4. User submits 70
+5. Game says "lower"
+6. Attempts are now 6
+7. User mistakenly submits a blank space
+8. Game throws error saying "Enter a guess"
+9. No. of attempts remain the same
+10. User inputs 60
+11. Game says "congrats"
 
 **Screenshot** *(optional)*: <!-- Insert a screenshot of your fixed, winning game here -->
 

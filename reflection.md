@@ -23,15 +23,13 @@ Alphabets throw a "that's not a number" error (This Is Good)
 | number <= 0   | Error Message     | Code ran like normal | None                   |
 |---------------|-------------------|----------------------|------------------------|
 | First Guess   | Attempts left -= 1| Attempts starts to   | None                   |
-|               |                   | reduces on 2nd guess | None                   |
+|               |                   | reduces on 2nd guess |                        |
 |---------------|-------------------|----------------------|------------------------|
 |Attempts reduce| Attempts remain   | Attempts reduce by 1 | None                   |
 |for letters and| static            | like normal          |                        |
 |blank guesses  |                   |                      |                        |
 |---------------|-------------------|----------------------|------------------------|
-| New Game      | Attempts reset    | Attempts reset to 8  | None                   |
-|               | to 7              |                      |                        | 
-|---------------|-------------------|----------------------|------------------------|
+
 
 ---
 
@@ -44,21 +42,21 @@ Alphabets throw a "that's not a number" error (This Is Good)
 -> The suggestion to input 1 and 100 and low and high respectively to the parse_guess function to solve the issue of the game not recognizing numbers outside 1-100 as errors.
 
 - Give one example of an AI suggestion that was incorrect or misleading (including what the AI suggested and how you verified the result).
--> In my case, AI fixed the issue of numbers/blank submissions being seen as valid to affect no. of attempts. However, it did not initially include an error/warning for the user which I had to additionally ask to implement. It would have been misleading to blindly reject user input without stating the main issue.
+-> There was a bug that allowed numbers outside the range of 1 to 100 to be entered in as valid guesses, when I highlighted this bux and asked for its fix, it implemented it but only took note of numbers below 1 (0 and negatives). It wasn't until I ran the tests that I went back to fix the issue to include numbers above 100 as well.
 
 ---
 
 ## 3. Debugging and testing your fixes
 
 - How did you decide whether a bug was really fixed?
--> I asked Claude to generate pytest cases in tests file and ran pytests in the terminal to make sure that the new tests were passing with the existing starter tests. 
+-> I asked Claude to generate pytest cases in tests file and ran pytests in the terminal to make sure that the new tests were passing with the existing starter tests. I also ran tests on the actual app to make sure it was working well.
 
 - Describe at least one test you ran (manual or using pytest)  
   and what it showed you about your code.
 -> I put t and "" as guessing numbers and got an error showing "That is not a number" and "Enter a Guess" respectively.
 
 - Did AI help you design or understand any tests? How?
--> No, I just tested based on previous bugs identified by myself.
+-> Yes, it helped me generate 110 pytests and I ran them in terminal to make sure they all passed. We also ran tests for other functions in logic_utils like check_guess and get_range_for_difficulty
 
 ---
 
