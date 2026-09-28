@@ -189,6 +189,9 @@ if "status" not in st.session_state:
 if "history" not in st.session_state:
     st.session_state.history = []
 
+if st.session_state.pop("just_started", False):
+    st.toast("New game started 🔁")
+
 attempts_left = attempt_limit - st.session_state.attempts
 
 # ---------------------------------------------------------------------------
@@ -269,12 +272,21 @@ with col3:
     show_hint = st.checkbox("Show hint", value=True)
 
 if new_game:
+    # FIX: New Game reset only attempts and secret, so status stayed "won" or
+    # "lost" and the rerun fell straight into the st.stop() guard below - the
+    # button was dead once a round ended. Every per-game key resets now.
     st.session_state.attempts = 0
     # FIX: was randint(1, 100), so a new game on Easy or Hard could pick a
     # secret outside the advertised range - and therefore outside the set of
     # guesses parse_guess will accept, making the game unwinnable.
     st.session_state.secret = random.randint(low, high)
-    st.success("New game started.")
+    st.session_state.score = 0
+    st.session_state.history = []
+    st.session_state.status = "playing"
+    # FIX: st.success() here never rendered, because st.rerun() discards the
+    # current page before it paints. The confirmation is deferred to the next
+    # run instead, where it actually reaches the player.
+    st.session_state.just_started = True
     st.rerun()
 
 if st.session_state.status != "playing":
